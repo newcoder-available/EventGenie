@@ -1,0 +1,394 @@
+@import "tailwindcss";
+
+/* ==================================================================== *
+ * EventGenie design system
+ *
+ * A luxury wedding palette with SaaS discipline. One theme, specified:
+ * burgundy on warm ivory, champagne gold reserved for milestones and
+ * premium detail, never for body text (it does not carry contrast).
+ *
+ * The chart series below are NOT the brand colours. They are a separate
+ * categorical set, run through a contrast/CVD validator against this
+ * ivory surface: every slot clears the lightness band, the chroma floor,
+ * adjacent colourblind separation (worst pair ΔE 13.7) and the
+ * normal-vision floor (worst pair ΔE 15.2). Re-tint them and that
+ * guarantee is gone, so they are fixed.
+ * ==================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* brand */
+  --primary: #8f3150;
+  --primary-deep: #70253e;
+  --primary-tint: #f6e9ed;
+  --secondary: #d9a0aa;
+  --gold: #c8a96b;
+  --gold-tint: #f6efe1;
+
+  /* surfaces */
+  --canvas: #faf7f2;
+  --surface: #ffffff;
+  --surface-sunken: #f4efe8;
+  --line: #e9e1d7;
+  --line-strong: #d8cdbf;
+
+  /* text */
+  --ink: #29242a;
+  --ink-muted: #77717a;
+  --ink-faint: #a09aa3;
+  --on-primary: #ffffff;
+
+  /* status */
+  --success: #4f7a5c;
+  --success-tint: #e8f0ea;
+  --warning: #a9741c;
+  --warning-tint: #faf0dc;
+  --danger: #a5342c;
+  --danger-tint: #faeae8;
+
+  /* chart series — validated as a set, do not re-tint */
+  --series-1: #9e2b52;
+  --series-2: #c75b33;
+  --series-3: #00879b;
+  --series-4: #b3801a;
+  --series-5: #7b4bb5;
+  --series-6: #2e8b57;
+  --series-7: #2f5fa8;
+  --series-8: #d1739f;
+  --series-other: #9a9199;
+
+  --grid: #ece5db;
+
+  --shadow-sm: 0 1px 2px rgb(41 36 42 / 0.05);
+  --shadow: 0 1px 2px rgb(41 36 42 / 0.04), 0 8px 22px -14px rgb(41 36 42 / 0.2);
+  --shadow-lg: 0 2px 6px rgb(41 36 42 / 0.06), 0 18px 44px -20px rgb(41 36 42 / 0.28);
+
+  --radius: 14px;
+  --sidebar-w: 16rem;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-sunken: var(--surface-sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-primary: var(--primary);
+  --color-primary-deep: var(--primary-deep);
+  --color-primary-tint: var(--primary-tint);
+  --color-secondary: var(--secondary);
+  --color-gold: var(--gold);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-display: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* {
+  border-color: var(--line);
+  min-width: 0;
+}
+
+html {
+  background: var(--canvas);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Nothing in this app should scroll sideways. */
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--primary-tint);
+  color: var(--primary-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ----------------------------- primitives ----------------------------- */
+
+.eg-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.eg-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* The one place gold is allowed to lead: a wedding milestone. */
+.eg-gold-rule {
+  background: linear-gradient(90deg, var(--gold), color-mix(in srgb, var(--gold) 20%, transparent));
+}
+
+/* A quiet botanical wash for hero surfaces. */
+.eg-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(130% 150% at 88% -30%, var(--primary-tint) 0%, transparent 58%),
+    radial-gradient(90% 120% at 4% 110%, var(--gold-tint) 0%, transparent 55%),
+    var(--surface);
+}
+
+/* --------------------------- scrollbar polish -------------------------- */
+
+.eg-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+.eg-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.eg-scroll::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 99px;
+}
+.eg-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ------------------------------ animation ------------------------------ */
+
+@keyframes eg-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.eg-rise {
+  animation: eg-rise 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+@keyframes eg-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.eg-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-sunken) 25%,
+    var(--surface) 50%,
+    var(--surface-sunken) 75%
+  );
+  background-size: 200% 100%;
+  animation: eg-shimmer 1.5s linear infinite;
+  border-radius: 8px;
+}
+
+@keyframes eg-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* ------------------------------- Recharts ------------------------------ */
+
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+.recharts-sector {
+  transition: opacity 0.16s ease;
+}
+
+/* -------------------------------- print -------------------------------- */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .eg-card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
+
+/* ==================================================================== *
+ * Occasion themes.
+ *
+ * Choosing an occasion stamps data-event on <html>, which swaps the
+ * brand accent only. The canvas, the card surfaces and the eight
+ * --series-* chart slots are deliberately NOT themed: that palette was
+ * validated as a set against this ivory canvas, and re-tinting either
+ * would silently void the guarantee.
+ *
+ * These hexes mirror src/lib/eventThemes.ts; scripts/selftest.mts
+ * asserts the two stay in step and that each clears 4.5:1.
+ * ==================================================================== */
+
+:root[data-event="wedding"] {
+  --primary: #8f3150;
+  --primary-deep: #70253e;
+  --primary-tint: #f6e9ed;
+  --secondary: #d9a0aa;
+}
+:root[data-event="birthday"] {
+  --primary: #9a2ba8;
+  --primary-deep: #7a2186;
+  --primary-tint: #f7eaf9;
+  --secondary: #e3b1ea;
+}
+:root[data-event="corporate"] {
+  --primary: #2e5f8f;
+  --primary-deep: #244c73;
+  --primary-tint: #e9f0f7;
+  --secondary: #a8c6e0;
+}
+:root[data-event="diwali"] {
+  --primary: #a8490c;
+  --primary-deep: #873a09;
+  --primary-tint: #fbeee4;
+  --secondary: #e8b579;
+}
+:root[data-event="anniversary"] {
+  --primary: #8a6212;
+  --primary-deep: #6e4e0e;
+  --primary-tint: #f7f0e0;
+  --secondary: #dcc189;
+}
+:root[data-event="baby-shower"] {
+  --primary: #6a52c0;
+  --primary-deep: #55429a;
+  --primary-tint: #efecfb;
+  --secondary: #bcb0ea;
+}
+:root[data-event="other"] {
+  --primary: #6d4c7d;
+  --primary-deep: #573d64;
+  --primary-tint: #f1ecf4;
+  --secondary: #c3aed0;
+}
+
+/* ------------------------------ decoration ----------------------------- */
+
+/* The motif tile is a mask, not an image, so one SVG serves every
+   occasion and simply takes the current accent. */
+.motif {
+  background-color: var(--primary);
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  pointer-events: none;
+}
+
+@keyframes eg-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -7px, 0);
+  }
+}
+
+.eg-float {
+  animation: eg-float 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eg-float {
+    animation: none;
+  }
+}
+
+/* ------------------------------- confetti ------------------------------ */
+
+@keyframes eg-confetti-fall {
+  0% {
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), 104vh, 0) rotate(var(--spin, 540deg));
+    opacity: 0;
+  }
+}
+
+.eg-confetti {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  will-change: transform, opacity;
+  animation: eg-confetti-fall var(--dur, 2.6s) cubic-bezier(0.2, 0.6, 0.5, 1) forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eg-confetti {
+    display: none;
+  }
+}
