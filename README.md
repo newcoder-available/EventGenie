@@ -40,6 +40,10 @@ cp .env.example .env.local   # then set ANTHROPIC_API_KEY
 
 ---
 
+> **Making a demo video?** [`docs/demo-script.md`](docs/demo-script.md) has a 90-second shot
+> list with narration, the generation prompts for the B-roll, and the checked figures so the
+> voiceover and the screen agree.
+
 ## Screenshots
 
 **Step 1 — pick the occasion.** The landing page is the product's front door: seven occasions,
