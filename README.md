@@ -266,6 +266,9 @@ photos later: add an `imageUrl` to the record, render an `<img>` when present, f
 
 ---
 
+> Structure, layering and the three rules the code follows:
+> [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+
 ## Project layout
 
 ```

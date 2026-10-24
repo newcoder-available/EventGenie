@@ -27,7 +27,8 @@ import {
 } from "../src/lib/calculations.ts";
 import { expenseSchema, guestSchema, profileSchema, eventStateSchema } from "../src/lib/validation.ts";
 import { EventContextSchema, GenerationSchema } from "../src/lib/ai-schema.ts";
-import { buildContext, classify, mockGeneration, mockReply } from "../src/lib/ai-service.ts";
+import { buildContext } from "../src/lib/ai-service.ts";
+import { classify, mockGeneration, mockReply } from "../src/lib/local-planner.ts";
 import { BUDGET_CATEGORIES, EVENT_TYPES } from "../src/types/event.ts";
 import { ACCENTS, ACCENT_KEYS, MOTIF_KEYS, MOTIFS } from "../src/lib/eventThemes.ts";
 import { escapeCsvCell, guestsToCsv } from "../src/lib/csv.ts";

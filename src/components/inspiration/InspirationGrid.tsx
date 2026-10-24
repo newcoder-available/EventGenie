@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, Image as ImageIcon, Pencil, Sparkles, Trash2 } from "lucide-react";
+import {
+  Heart,
+  Image as ImageIcon,
+  Pencil,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
 import { useToast } from "@/hooks/useToast";
 import { cn } from "@/lib/utils";
-import { INSPIRATION_CATEGORIES, type InspirationItem } from "@/types/event";
+import type { InspirationItem } from "@/types/event";
 import { Artwork } from "@/components/ui/Artwork";
-import { Badge, Button, Dialog, DialogContent, EmptyState, Field, Input, Select, Textarea } from "@/components/ui";
+import { Badge, Button, EmptyState } from "@/components/ui";
+import { InspirationDialog } from "./InspirationDialog";
 
 export function InspirationGrid({
   filter,
@@ -31,7 +38,9 @@ export function InspirationGrid({
     return (
       <EmptyState
         icon={ImageIcon}
-        title={favouritesOnly ? "Nothing saved yet" : "No ideas in this category"}
+        title={
+          favouritesOnly ? "Nothing saved yet" : "No ideas in this category"
+        }
         detail="Save the ones you like, or ask the assistant to suggest some for your theme."
       />
     );
@@ -55,13 +64,22 @@ export function InspirationGrid({
                     id: item.id,
                     patch: { favorite: !item.favorite },
                   });
-                  toast(item.favorite ? "Removed from favourites" : "Saved to favourites", {
-                    detail: item.title,
-                    tone: item.favorite ? "info" : "success",
-                  });
+                  toast(
+                    item.favorite
+                      ? "Removed from favourites"
+                      : "Saved to favourites",
+                    {
+                      detail: item.title,
+                      tone: item.favorite ? "info" : "success",
+                    },
+                  );
                 }}
                 aria-pressed={item.favorite}
-                aria-label={item.favorite ? `Unfavourite ${item.title}` : `Favourite ${item.title}`}
+                aria-label={
+                  item.favorite
+                    ? `Unfavourite ${item.title}`
+                    : `Favourite ${item.title}`
+                }
                 className="absolute right-3 top-3 rounded-lg bg-[var(--surface)]/90 p-2 backdrop-blur transition-colors"
               >
                 <Heart
@@ -74,11 +92,17 @@ export function InspirationGrid({
                 />
               </button>
               <div className="absolute left-3 top-3 flex gap-1.5">
-                <Badge tone="neutral" className="bg-[var(--surface)]/90 backdrop-blur">
+                <Badge
+                  tone="neutral"
+                  className="bg-[var(--surface)]/90 backdrop-blur"
+                >
                   {item.category}
                 </Badge>
                 {item.source === "ai" && (
-                  <Badge tone="primary" className="gap-1 bg-[var(--surface)]/90 backdrop-blur">
+                  <Badge
+                    tone="primary"
+                    className="gap-1 bg-[var(--surface)]/90 backdrop-blur"
+                  >
                     <Sparkles className="h-2.5 w-2.5" aria-hidden /> AI
                   </Badge>
                 )}
@@ -89,7 +113,9 @@ export function InspirationGrid({
               <h3 className="font-display text-base leading-snug text-[var(--ink)]">
                 {item.title}
               </h3>
-              <p className="mt-1.5 flex-1 text-sm text-[var(--ink-muted)]">{item.note}</p>
+              <p className="mt-1.5 flex-1 text-sm text-[var(--ink-muted)]">
+                {item.note}
+              </p>
               <div className="mt-3 flex items-center justify-between">
                 <span className="flex gap-1" aria-hidden>
                   {item.palette.map((c) => (
@@ -115,7 +141,10 @@ export function InspirationGrid({
                     aria-label={`Remove ${item.title}`}
                     onClick={() => {
                       dispatch({ type: "inspiration/delete", id: item.id });
-                      toast("Removed from the board", { detail: item.title, tone: "info" });
+                      toast("Removed from the board", {
+                        detail: item.title,
+                        tone: "info",
+                      });
                     }}
                   >
                     <Trash2 />
@@ -133,109 +162,5 @@ export function InspirationGrid({
         editing={editing}
       />
     </>
-  );
-}
-
-export function InspirationDialog({
-  open,
-  onOpenChange,
-  editing,
-}: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  editing?: InspirationItem | null;
-}) {
-  const { dispatch } = useEvent();
-  const { toast } = useToast();
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<InspirationItem["category"]>("Florals");
-  const [note, setNote] = useState("");
-  const [error, setError] = useState("");
-
-  // Seed the fields each time the dialog opens.
-  const [lastOpen, setLastOpen] = useState(false);
-  if (open !== lastOpen) {
-    setLastOpen(open);
-    if (open) {
-      setTitle(editing?.title ?? "");
-      setCategory(editing?.category ?? "Florals");
-      setNote(editing?.note ?? "");
-      setError("");
-    }
-  }
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (title.trim().length < 2) {
-      setError("Give the idea a name");
-      return;
-    }
-    if (editing) {
-      dispatch({
-        type: "inspiration/update",
-        id: editing.id,
-        patch: { title: title.trim(), category, note: note.trim() },
-      });
-      toast("Idea updated", { detail: title.trim() });
-    } else {
-      dispatch({
-        type: "inspiration/add",
-        item: {
-          title: title.trim(),
-          category,
-          note: note.trim(),
-          favorite: false,
-          palette: ["#9e2b52", "#b3801a"],
-          art: Math.floor(Math.random() * 40),
-        },
-      });
-      toast("Idea added to the board", { detail: title.trim() });
-    }
-    onOpenChange(false);
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent title={editing ? "Edit idea" : "Add an idea"}>
-        <form onSubmit={submit} className="space-y-4">
-          <Field label="Idea" error={error} htmlFor="insp-title">
-            <Input
-              id="insp-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Hanging marigold over the aisle"
-            />
-          </Field>
-          <Field label="Category" htmlFor="insp-cat">
-            <Select
-              id="insp-cat"
-              value={category}
-              onChange={(e) => setCategory(e.target.value as InspirationItem["category"])}
-            >
-              {INSPIRATION_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Note" htmlFor="insp-note">
-            <Textarea
-              id="insp-note"
-              rows={3}
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="What you like about it, or what to ask the decorator"
-            />
-          </Field>
-          <div className="flex justify-end gap-2 pt-1">
-            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">{editing ? "Save changes" : "Add to board"}</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }

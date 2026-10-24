@@ -7,7 +7,8 @@ import { useEvent } from "@/hooks/useEvent";
 import { INSPIRATION_CATEGORIES } from "@/types/event";
 import { cn } from "@/lib/utils";
 import { Button, Card, PageHeading } from "@/components/ui";
-import { InspirationDialog, InspirationGrid } from "@/components/inspiration/InspirationGrid";
+import { InspirationGrid } from "@/components/inspiration/InspirationGrid";
+import { InspirationDialog } from "@/components/inspiration/InspirationDialog";
 
 export default function InspirationPage() {
   const { state } = useEvent();

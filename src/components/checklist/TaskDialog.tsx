@@ -8,7 +8,8 @@ import { useToast } from "@/hooks/useToast";
 import { taskSchema, type TaskInput } from "@/lib/validation";
 import { TASK_CATEGORIES, type Task } from "@/types/event";
 import { ownerOptions } from "@/lib/utils";
-import { Button, Dialog, DialogContent, Field, Input, Select } from "@/components/ui";
+import { Field, Input, Select } from "@/components/ui";
+import { FormDialog } from "@/components/ui/FormDialog";
 
 export function TaskDialog({
   open,
@@ -55,7 +56,9 @@ export function TaskDialog({
             title: "",
             category: "Vendors",
             // Default to a fortnight out: near enough to be real, far enough to plan.
-            dueDate: new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10),
+            dueDate: new Date(Date.now() + 14 * 86_400_000)
+              .toISOString()
+              .slice(0, 10),
             priority: "medium",
             owner: owners[0],
           },
@@ -76,54 +79,69 @@ export function TaskDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent title={editing ? "Edit task" : "Add a task"}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Field label="Task" error={errors.title?.message} htmlFor="task-title">
-            <Input id="task-title" placeholder="Confirm the catering menu" {...register("title")} />
-          </Field>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={editing ? "Edit task" : "Add a task"}
+      submitLabel={editing ? "Save changes" : "Add task"}
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Field label="Task" error={errors.title?.message} htmlFor="task-title">
+        <Input
+          id="task-title"
+          placeholder="Confirm the catering menu"
+          {...register("title")}
+        />
+      </Field>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Category" error={errors.category?.message} htmlFor="task-cat">
-              <Select id="task-cat" {...register("category")}>
-                {TASK_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Due date" error={errors.dueDate?.message} htmlFor="task-due">
-              <Input id="task-due" type="date" {...register("dueDate")} />
-            </Field>
-          </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field
+          label="Category"
+          error={errors.category?.message}
+          htmlFor="task-cat"
+        >
+          <Select id="task-cat" {...register("category")}>
+            {TASK_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field
+          label="Due date"
+          error={errors.dueDate?.message}
+          htmlFor="task-due"
+        >
+          <Input id="task-due" type="date" {...register("dueDate")} />
+        </Field>
+      </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Priority" error={errors.priority?.message} htmlFor="task-pri">
-              <Select id="task-pri" {...register("priority")}>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-              </Select>
-            </Field>
-            <Field label="Owner" error={errors.owner?.message} htmlFor="task-owner">
-              <Input id="task-owner" list="task-owner-options" {...register("owner")} />
-              <datalist id="task-owner-options">
-                {owners.map((o) => (
-                  <option key={o} value={o} />
-                ))}
-              </datalist>
-            </Field>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-1">
-            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">{editing ? "Save changes" : "Add task"}</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field
+          label="Priority"
+          error={errors.priority?.message}
+          htmlFor="task-pri"
+        >
+          <Select id="task-pri" {...register("priority")}>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </Select>
+        </Field>
+        <Field label="Owner" error={errors.owner?.message} htmlFor="task-owner">
+          <Input
+            id="task-owner"
+            list="task-owner-options"
+            {...register("owner")}
+          />
+          <datalist id="task-owner-options">
+            {owners.map((o) => (
+              <option key={o} value={o} />
+            ))}
+          </datalist>
+        </Field>
+      </div>
+    </FormDialog>
   );
 }
