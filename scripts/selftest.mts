@@ -29,6 +29,8 @@ import { expenseSchema, guestSchema, profileSchema, eventStateSchema } from "../
 import { EventContextSchema, GenerationSchema } from "../src/lib/ai-schema.ts";
 import { buildContext, classify, mockGeneration, mockReply } from "../src/lib/ai-service.ts";
 import { BUDGET_CATEGORIES, EVENT_TYPES } from "../src/types/event.ts";
+import { ACCENTS, ACCENT_KEYS, MOTIF_KEYS, MOTIFS } from "../src/lib/eventThemes.ts";
+import { escapeCsvCell, guestsToCsv } from "../src/lib/csv.ts";
 
 const state = createDemoState("wedding");
 
@@ -370,6 +372,68 @@ test("the chart series are declared once and not re-tinted per theme", () => {
     );
   }
   assert.ok(css.includes("--series-other:"), "the Other/Miscellaneous neutral is missing");
+});
+
+/* --------------------------------- CSV export -------------------------------- */
+
+test("CSV export survives the characters that break a naive join", () => {
+  assert.equal(escapeCsvCell("Sam"), "Sam");
+  assert.equal(escapeCsvCell("O'Brien, Sam"), '"O\'Brien, Sam"');
+  assert.equal(escapeCsvCell('He said "yes"'), '"He said ""yes"""');
+  assert.equal(escapeCsvCell("line one\nline two"), '"line one\nline two"');
+  assert.equal(escapeCsvCell(12), "12");
+});
+
+test("the exported guest list has one row per household and a stable header", () => {
+  const csv = guestsToCsv(state.guests);
+  const lines = csv.split("\r\n");
+  assert.equal(lines.length, state.guests.length + 1);
+  assert.equal(lines[0], "Name,Group,Party size,RSVP,Meal,Table,Note");
+  // A quoted cell may contain a comma, so count only unquoted separators.
+  for (const line of lines) {
+    const unquoted = line.replace(/"(?:[^"]|"")*"/g, "");
+    assert.equal(unquoted.split(",").length, 7, `wrong column count: ${line}`);
+  }
+});
+
+/* ------------------------------ theme presets -------------------------------- */
+
+test("every accent preset clears 4.5:1 in each role it is used for", () => {
+  // Custom occasions pick from this set, so the contrast guarantee has to hold
+  // for all of it — not just the seven the built-ins happen to use.
+  const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const lum = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => lin(parseInt(hex.slice(i, i + 2), 16) / 255));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const ratio = (a: string, b: string) => {
+    const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+
+  for (const key of ACCENT_KEYS) {
+    const { accent } = ACCENTS[key];
+    for (const [role, against] of [
+      ["the canvas", "#faf7f2"],
+      ["a card", "#ffffff"],
+      ["white text on it", "#ffffff"],
+    ] as const) {
+      const r = ratio(accent, against);
+      assert.ok(r >= 4.5, `${key}: ${accent} is only ${r.toFixed(2)}:1 against ${role}`);
+    }
+  }
+});
+
+test("every motif is a self-contained, mask-safe SVG", () => {
+  for (const key of MOTIF_KEYS) {
+    const { svg, label } = MOTIFS[key];
+    assert.ok(svg.startsWith("<svg"), `${key}: not an svg`);
+    assert.ok(svg.includes("xmlns="), `${key}: missing xmlns, will not load as a data URI`);
+    assert.ok(svg.includes("viewBox="), `${key}: missing viewBox, will not scale`);
+    // Masks read alpha only, so a motif must be drawn in a single flat colour.
+    assert.ok(!/fill="#(?!000)/.test(svg), `${key}: motif uses a colour other than black`);
+    assert.ok(label.length > 2, `${key}: needs a human-readable label for the picker`);
+  }
 });
 
 /* ------------------------- live endpoint probes ------------------------- */

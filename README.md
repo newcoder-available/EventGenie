@@ -1,15 +1,69 @@
 # EventGenie — AI planning for any celebration
 
-Pick your occasion, sign in, and plan it: budget, checklist, timeline, guests, vendors,
-inspiration, a run sheet, and an AI planner that writes real tasks, ideas and budget lines
-straight into the dashboard.
+> A GenAI planning assistant for weddings, birthdays and community events: budgets, timelines,
+> vendor checklists and personalised ideas, in one place.
 
-**Seven occasions, each with its own theme and its own starter plan** — wedding, birthday,
-corporate event, Diwali or festival, anniversary, baby shower, and a catch-all for everything
-else. Choosing one re-skins the whole product: accent colour, decoration, copy, checklist,
-budget split, vendors, run sheet and the assistant's suggested prompts.
+---
+
+## The problem
+
+Planning a celebration is not one job, it is four, and they all depend on each other:
+
+| | The job | Where it goes wrong |
+| --- | --- | --- |
+| **Money** | Decide what you can spend, then track it | The budget lives in a spreadsheet that nobody updates after week two |
+| **Time** | Work out what has to happen when | People book the venue first and discover the photographer is gone |
+| **People** | Invite, chase, count | The caterer prices on a number nobody has confirmed |
+| **Suppliers** | Find, compare, commit | Quotes arrive in WhatsApp and are never compared side by side |
+
+The failure is always the same shape: **the four live in four different places, so none of them
+agrees with the others.** You find out your guest count changed when the caterer's invoice
+arrives, not when you edited the spreadsheet.
+
+Existing tools mostly solve one quarter of this, and nearly all of them assume a wedding. A
+fortieth birthday, a Diwali open house and a company offsite need exactly the same four things
+in different proportions — and get handed a bridal checklist.
+
+## The approach
+
+**One state object; every number derived from it.** Change the guest count and the per-head
+spend, the catering estimate and the RSVP progress all move together, because no screen keeps
+its own copy of a total. This is the core design decision and everything else follows from it.
+
+**The occasion is a parameter, not a fork.** Seven occasions share one codebase: the accent,
+decoration, copy, budget split, vendor categories and starter plan all come from a template.
+A birthday is not a wedding with words crossed out.
+
+**The AI writes into the plan, not just the chat.** Ask for a six-week checklist and you get
+real tasks with real dates, previewed, and written into your checklist when you approve them.
+A chat window that only produces prose leaves you retyping it.
+
+## How this maps to the brief
+
+| Asked for | Where it is | Notes |
+| --- | --- | --- |
+| Weddings, birthdays, community events | Occasion picker → 7 themed plans | Plus corporate, Diwali/festival, anniversary, baby shower, and a catch-all |
+| **Budgets** | `/budget` | Donut + category rollup + full ledger, CRUD, CSV-safe export |
+| **Timelines** | `/timeline`, `/schedule` | Milestones derived from the event date; an hour-by-hour run sheet |
+| **Vendor checklists** | `/vendors` | Status workflow, shortlist, three-way comparison |
+| **Personalised ideas** | `/inspiration` + assistant | Sized to the guest count and per-head spend |
+| **GenAI** | `/assistant`, `src/lib/ai-service.ts` | Streaming chat + schema-constrained generation |
+
+Beyond the brief: guest/RSVP tracking, a weighted progress model, offline operation with no API
+key, and a security posture documented in [SECURITY.md](SECURITY.md).
+
+---
 
 Next.js 16 · React 19 · TypeScript · Tailwind v4 · Radix · Recharts · Zod · Anthropic SDK.
+
+---
+
+## Verify it
+
+```bash
+npm install
+npm run verify     # lint, typecheck, 26 tests
+```
 
 ---
 
@@ -34,9 +88,11 @@ cp .env.example .env.local   # then set ANTHROPIC_API_KEY
 | `npm run dev` | Dev server |
 | `npm run build` / `npm start` | Production build and serve |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run selftest` | 21 tests: redaction, fencing, derived arithmetic, validation, per-occasion plans, theme integrity, accent contrast |
-| `EVENTGENIE_LIVE=1 npm run selftest` | Adds live probes of CSP, cross-origin refusal, error hygiene |
-| `EVENTGENIE_LIVE=burst npm run selftest` | Adds the rate-limit burst (spends the hourly window) |
+| `npm run lint` | ESLint, flat config, zero warnings |
+| `npm run verify` | lint + typecheck + tests, in one go |
+| `npm test` | 26 tests: redaction, prompt fencing, derived arithmetic, validation boundaries, per-occasion plan integrity, CSV escaping, accent contrast |
+| `EVENTGENIE_LIVE=1 npm test` | Adds live probes of CSP, cross-origin refusal, error hygiene |
+| `EVENTGENIE_LIVE=burst npm test` | Adds the rate-limit burst (spends the hourly window) |
 
 ---
 

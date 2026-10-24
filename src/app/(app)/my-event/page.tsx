@@ -14,30 +14,19 @@ import {
 } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
 import { themeFor } from "@/lib/eventThemes";
-import {
-  budgetSummary,
-  countdown,
-  formatDate,
-  formatMoney,
-  guestSummary,
-  overallProgress,
-  vendorSummary,
-} from "@/lib/calculations";
+import { countdown, formatDate, formatMoney } from "@/lib/calculations";
 import { Artwork } from "@/components/ui/Artwork";
 import { Badge, Button, Card, CardHeader, PageHeading, Progress } from "@/components/ui";
 import { ProfileDialog } from "@/components/dashboard/ProfileDialog";
 
 export default function MyEventPage() {
-  const { state } = useEvent();
+  const { state, summary } = useEvent();
   const [open, setOpen] = useState(false);
   const nouns = themeFor(state.profile.eventType).nouns;
   const { profile } = state;
 
   const cd = countdown(profile.eventDate);
-  const budget = budgetSummary(state);
-  const guests = guestSummary(state);
-  const vendors = vendorSummary(state);
-  const progress = overallProgress(state);
+  const { budget, guests, vendors, progress } = summary;
 
   const facts = [
     { icon: CalendarHeart, label: "Date", value: formatDate(profile.eventDate, { weekday: "long" }) },

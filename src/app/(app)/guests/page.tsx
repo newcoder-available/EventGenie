@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
-import { guestSummary } from "@/lib/calculations";
 import type { Guest } from "@/types/event";
 import { Button, Card, CardHeader, PageHeading, Progress } from "@/components/ui";
 import { GuestDialog } from "@/components/guests/GuestDialog";
@@ -11,10 +10,10 @@ import { GuestTable, RsvpSummary } from "@/components/guests/GuestTable";
 import { Users } from "lucide-react";
 
 export default function GuestsPage() {
-  const { state } = useEvent();
+  const { summary } = useEvent();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Guest | null>(null);
-  const g = guestSummary(state);
+  const g = summary.guests;
 
   function add() {
     setEditing(null);

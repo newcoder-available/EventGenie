@@ -30,6 +30,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- local storage cannot be read during render.
     setSession(loadSession());
     setReady(true);
   }, []);

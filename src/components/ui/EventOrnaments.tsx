@@ -374,6 +374,9 @@ export function Confetti({ run }: { run: number }) {
 
   useEffect(() => {
     if (run === 0) return;
+    // A burst is an imperative, one-shot animation triggered by the parent,
+    // not something derivable from render state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- imperative animation.
     setAlive(true);
     const id = setTimeout(() => setAlive(false), 3400);
     return () => clearTimeout(id);

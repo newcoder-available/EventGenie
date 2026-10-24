@@ -32,6 +32,8 @@ export default function SignInPage() {
   }, [ready, eventType, router]);
 
   useEffect(() => {
+    // Prefills from the stored session, which only exists after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads stored session.
     if (session?.name) setName(session.name);
     if (session?.email) setEmail(session.email);
   }, [session]);

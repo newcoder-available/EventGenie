@@ -4,14 +4,14 @@ import { useMemo, useState } from "react";
 import { Download, Pencil, Trash2, Users } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
 import { useToast } from "@/hooks/useToast";
-import { guestSummary } from "@/lib/calculations";
 import { themeFor } from "@/lib/eventThemes";
+import { guestsToCsv } from "@/lib/csv";
 import type { Guest, RsvpStatus } from "@/types/event";
 import { Badge, Button, EmptyState, Input, Select } from "@/components/ui";
 
 export function RsvpSummary() {
-  const { state } = useEvent();
-  const g = guestSummary(state);
+  const { summary } = useEvent();
+  const g = summary.guests;
   const stats = [
     { label: "Invited", value: g.invited, tone: "var(--ink)" },
     { label: "Accepted", value: g.accepted, tone: "var(--success)" },
@@ -31,19 +31,6 @@ export function RsvpSummary() {
       ))}
     </div>
   );
-}
-
-/** CSV built client-side; the guest list never touches a server. */
-function toCsv(guests: Guest[]): string {
-  const header = ["Name", "Side", "Party size", "RSVP", "Meal", "Table", "Note"];
-  const escape = (v: string | number) => {
-    const s = String(v);
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  const rows = guests.map((g) =>
-    [g.name, g.side, g.partySize, g.rsvp, g.meal, g.table, g.note ?? ""].map(escape).join(","),
-  );
-  return [header.join(","), ...rows].join("\r\n");
 }
 
 export function GuestTable({
@@ -74,7 +61,7 @@ export function GuestTable({
   const shown = limit ? filtered.slice(0, limit) : filtered;
 
   function exportCsv() {
-    const blob = new Blob([toCsv(filtered)], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob([guestsToCsv(filtered)], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;

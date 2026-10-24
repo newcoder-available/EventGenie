@@ -14,6 +14,9 @@ function useLiveCountdown(date: string) {
 
   // Start ticking only after mount: the server has no "now" that would match.
   useEffect(() => {
+    // The clock is an external source; reading it during render would also
+    // break hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads the clock.
     setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);

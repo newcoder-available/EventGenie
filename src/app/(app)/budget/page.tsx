@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Plus, Settings2, Wallet } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
-import { budgetByCategory, budgetSummary, formatMoney } from "@/lib/calculations";
+import { formatMoney } from "@/lib/calculations";
 import type { BudgetCategory, Expense } from "@/types/event";
 import { BUDGET_CATEGORIES } from "@/types/event";
 import { Badge, Button, Card, CardHeader, PageHeading, Progress, Select } from "@/components/ui";
@@ -13,14 +13,13 @@ import { ExpenseTable } from "@/components/budget/ExpenseTable";
 import { ProfileDialog } from "@/components/dashboard/ProfileDialog";
 
 export default function BudgetPage() {
-  const { state } = useEvent();
+  const { state, summary } = useEvent();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [filter, setFilter] = useState<"All" | BudgetCategory>("All");
 
-  const budget = budgetSummary(state);
-  const rows = budgetByCategory(state);
+  const { budget, categories: rows } = summary;
   const { currency } = state.profile;
 
   const visible = useMemo(

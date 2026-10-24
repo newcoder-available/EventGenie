@@ -54,9 +54,15 @@ export function BudgetDonut({ rows, currency, centreValue, centreLabel }: Props)
     );
   }
 
+  // A screen reader gets the summary here and the per-category figures from
+  // the legend beside it, so the ring is described rather than silent.
+  const label = `Budget split by category. ${rows
+    .map((r) => `${r.category} ${formatMoney(r.committed, currency)}, ${r.share.toFixed(0)} percent`)
+    .join(". ")}.`;
+
   return (
     <div className="relative">
-      <div className="h-[240px] w-full">
+      <div className="h-[240px] w-full" role="img" aria-label={label}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

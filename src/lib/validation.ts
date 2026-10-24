@@ -20,7 +20,7 @@ const isoDate = z
   .refine((d) => !Number.isNaN(Date.parse(d)), "That is not a real date");
 
 const money = z
-  .number({ invalid_type_error: "Enter an amount" })
+  .number({ error: "Enter an amount" })
   .min(0, "Cannot be negative")
   .max(1_000_000_000, "That is too large");
 
@@ -81,7 +81,7 @@ export const guestSchema = z.object({
   name: z.string().trim().min(2, "Required").max(60),
   side: z.string().trim().min(1, "Required").max(24),
   partySize: z
-    .number({ invalid_type_error: "Enter a number" })
+    .number({ error: "Enter a number" })
     .int("Whole people only")
     .min(1, "At least one")
     .max(30, "Split large groups into households"),

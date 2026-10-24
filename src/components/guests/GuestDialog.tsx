@@ -64,6 +64,9 @@ export function GuestDialog({
             note: "",
           },
     );
+    // nouns.guestGroups is stable for a given occasion and only supplies the
+    // default grouping; re-running on it would clobber a half-filled form.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editing, reset]);
 
   function onSubmit(values: GuestInput) {

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Bookmark, Columns3, Store, X } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
-import { formatMoney, vendorSummary } from "@/lib/calculations";
+import { formatMoney } from "@/lib/calculations";
 import { VENDOR_CATEGORIES, type BookingStatus, type VendorCategory } from "@/types/event";
 import { Badge, Button, Card, EmptyState, Input, PageHeading, Select } from "@/components/ui";
 import { VendorCard } from "@/components/vendors/VendorCard";
@@ -24,7 +24,7 @@ export default function VendorsPage() {
   const [shortlistOnly, setShortlistOnly] = useState(false);
   const [compare, setCompare] = useState<string[]>([]);
 
-  const summary = vendorSummary(state);
+  const vendors = useEvent().summary.vendors;
   const { currency } = state.profile;
 
   const filtered = useMemo(() => {
@@ -49,7 +49,7 @@ export default function VendorsPage() {
     <>
       <PageHeading
         title="Vendors"
-        subtitle={`${summary.booked} booked · ${summary.contacted} in progress · ${summary.outstanding} still to lock in`}
+        subtitle={`${vendors.booked} booked · ${vendors.contacted} in progress · ${vendors.outstanding} still to lock in`}
       />
 
       <div className="mb-4 rounded-xl border border-[var(--line)] bg-[var(--warning-tint)] px-4 py-2.5 text-xs text-[var(--ink-muted)]">

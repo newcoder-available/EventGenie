@@ -16,6 +16,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   // A route change should never leave the drawer hanging open behind the page.
+  // Covers back/forward navigation, which does not go through onNavigate.
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- history is external.
   useEffect(() => setMenuOpen(false), [pathname]);
 
   return (
@@ -44,9 +46,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
 
+      {/* First thing in the tab order: the sidebar is twelve links deep, and
+          keyboard users should not have to walk it on every page. */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-[var(--primary)] focus:px-4 focus:py-2 focus:text-sm focus:text-[var(--on-primary)]"
+      >
+        Skip to main content
+      </a>
+
       <div className="lg:pl-[var(--sidebar-w)]">
         <Topbar onOpenMenu={() => setMenuOpen(true)} />
-        <main className="mx-auto w-full max-w-[82rem] px-4 pb-16 pt-6 sm:px-6 sm:pb-10">
+        <main
+          id="main"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-[82rem] px-4 pb-16 pt-6 outline-none sm:px-6 sm:pb-10"
+        >
           {children}
         </main>
       </div>

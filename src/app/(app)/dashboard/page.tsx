@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
 import { themeFor } from "@/lib/eventThemes";
-import { budgetByCategory, budgetSummary, formatMoney } from "@/lib/calculations";
+import { formatMoney } from "@/lib/calculations";
 import type { Expense, Task } from "@/types/event";
 import { Button, Card, CardHeader, Progress } from "@/components/ui";
 import { KpiCards } from "@/components/dashboard/KpiCards";
@@ -48,7 +48,7 @@ function ViewAll({ href, label }: { href: string; label: string }) {
 }
 
 export default function OverviewPage() {
-  const { state } = useEvent();
+  const { state, summary } = useEvent();
   const router = useRouter();
   const nouns = themeFor(state.profile.eventType).nouns;
   const [celebrate, setCelebrate] = useState(0);
@@ -62,6 +62,7 @@ export default function OverviewPage() {
       /* private mode: just skip the flourish */
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- session storage cannot be read during render.
     setCelebrate(1);
   }, []);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -71,17 +72,14 @@ export default function OverviewPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("Pending");
 
-  const budget = budgetSummary(state);
-  const rows = budgetByCategory(state);
+  const { budget, categories: rows } = summary;
   const { currency } = state.profile;
 
   const taskCounts: Record<TaskFilter, number> = {
-    All: state.tasks.length,
-    Pending: state.tasks.filter((t) => !t.done).length,
-    Completed: state.tasks.filter((t) => t.done).length,
-    Overdue: state.tasks.filter(
-      (t) => !t.done && Date.parse(`${t.dueDate}T00:00:00Z`) < Date.now(),
-    ).length,
+    All: summary.tasks.total,
+    Pending: summary.tasks.pending,
+    Completed: summary.tasks.done,
+    Overdue: summary.tasks.overdue,
   };
 
   const recentExpenses = [...state.expenses]

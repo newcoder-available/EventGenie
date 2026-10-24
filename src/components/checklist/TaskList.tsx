@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ListChecks, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
 import { useToast } from "@/hooks/useToast";
@@ -28,12 +28,12 @@ export function TaskFilterBar({
   counts: Record<TaskFilter, number>;
 }) {
   return (
-    <div role="tablist" aria-label="Filter tasks" className="flex flex-wrap gap-1.5">
+    <div role="group" aria-label="Filter tasks" className="flex flex-wrap gap-1.5">
       {TASK_FILTERS.map((f) => (
         <button
           key={f}
-          role="tab"
-          aria-selected={value === f}
+          type="button"
+          aria-pressed={value === f}
           onClick={() => onChange(f)}
           className={cn(
             "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",

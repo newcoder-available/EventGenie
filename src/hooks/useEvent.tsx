@@ -10,6 +10,15 @@ import {
   useState,
 } from "react";
 import { createDemoState } from "@/data/events";
+import {
+  budgetByCategory,
+  budgetSummary,
+  guestSummary,
+  overallProgress,
+  taskSummary,
+  vendorSummary,
+  type CategoryRollup,
+} from "@/lib/calculations";
 import { clearPlan, loadPlan, savePlan } from "@/lib/storage";
 import { useSession } from "@/hooks/useSession";
 import { newId } from "@/lib/utils";
@@ -190,8 +199,27 @@ function reducer(state: EventState, action: Action): EventState {
   }
 }
 
+/**
+ * Every derived figure in the app, computed once per state change.
+ *
+ * Fourteen components used to call these selectors directly in render, and
+ * overallProgress alone walks the tasks, vendors, guests and milestones. That
+ * is seven full passes over the plan for one KPI row, repeated on every
+ * keystroke anywhere in the tree. Computing them here means one pass per
+ * change, shared by everyone through context.
+ */
+export type EventSummary = {
+  budget: ReturnType<typeof budgetSummary>;
+  categories: CategoryRollup[];
+  guests: ReturnType<typeof guestSummary>;
+  tasks: ReturnType<typeof taskSummary>;
+  vendors: ReturnType<typeof vendorSummary>;
+  progress: ReturnType<typeof overallProgress>;
+};
+
 type EventContextValue = {
   state: EventState;
+  summary: EventSummary;
   dispatch: React.Dispatch<Action>;
   ready: boolean;
   resetToDemo: () => void;
@@ -213,11 +241,22 @@ export function EventProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!sessionReady) return;
     dispatch({ type: "hydrate", state: loadPlan(active) });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- local storage cannot be read during render.
     setReady(true);
   }, [active, sessionReady]);
 
+  // Persistence is coalesced: ticking six checklist items used to serialise
+  // and write the whole plan six times. A short debounce collapses a burst
+  // into one write, and a pagehide flush means nothing is lost on the way out.
   useEffect(() => {
-    if (ready) savePlan(active, state);
+    if (!ready) return;
+    const id = setTimeout(() => savePlan(active, state), 400);
+    const flush = () => savePlan(active, state);
+    window.addEventListener("pagehide", flush);
+    return () => {
+      clearTimeout(id);
+      window.removeEventListener("pagehide", flush);
+    };
   }, [state, ready, active]);
 
   const resetToDemo = useCallback(() => {
@@ -225,9 +264,21 @@ export function EventProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "reset", eventType: active });
   }, [active]);
 
+  const summary = useMemo<EventSummary>(
+    () => ({
+      budget: budgetSummary(state),
+      categories: budgetByCategory(state),
+      guests: guestSummary(state),
+      tasks: taskSummary(state),
+      vendors: vendorSummary(state),
+      progress: overallProgress(state),
+    }),
+    [state],
+  );
+
   const value = useMemo(
-    () => ({ state, dispatch, ready, resetToDemo }),
-    [state, ready, resetToDemo],
+    () => ({ state, summary, dispatch, ready, resetToDemo }),
+    [state, summary, ready, resetToDemo],
   );
 
   return <EventContext.Provider value={value}>{children}</EventContext.Provider>;

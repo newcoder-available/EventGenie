@@ -3,20 +3,18 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
-import { taskSummary } from "@/lib/calculations";
 import type { Task } from "@/types/event";
 import { Button, Card, Input, PageHeading, Progress } from "@/components/ui";
 import { TaskDialog } from "@/components/checklist/TaskDialog";
 import { TaskFilterBar, TaskList, type TaskFilter } from "@/components/checklist/TaskList";
 
 export default function ChecklistPage() {
-  const { state } = useEvent();
   const [filter, setFilter] = useState<TaskFilter>("All");
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Task | null>(null);
 
-  const summary = taskSummary(state);
+  const summary = useEvent().summary.tasks;
   const counts: Record<TaskFilter, number> = {
     All: summary.total,
     Pending: summary.pending,

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { LogOut, Sparkles } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
 import { useSession } from "@/hooks/useSession";
-import { guestSummary, taskSummary, vendorSummary } from "@/lib/calculations";
 import { cn, hostInitials } from "@/lib/utils";
 import { themeFor } from "@/lib/eventThemes";
 import { EventIcon } from "@/components/ui/EventOrnaments";
@@ -80,12 +79,10 @@ function NavLink({
 }
 
 export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const { state } = useEvent();
+  const { state, summary } = useEvent();
   const { session, signOut } = useSession();
   const theme = themeFor(state.profile.eventType);
-  const tasks = taskSummary(state);
-  const guests = guestSummary(state);
-  const vendors = vendorSummary(state);
+  const { tasks, guests, vendors } = summary;
   const nav = primaryNav(theme.nouns);
 
   const badgeFor = (item: NavItem) =>

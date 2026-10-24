@@ -3,13 +3,7 @@
 import Link from "next/link";
 import { ArrowUpRight, ListChecks, Store, Users, Wallet } from "lucide-react";
 import { useEvent } from "@/hooks/useEvent";
-import {
-  budgetSummary,
-  formatMoney,
-  guestSummary,
-  overallProgress,
-  vendorSummary,
-} from "@/lib/calculations";
+import { formatMoney } from "@/lib/calculations";
 import { Progress } from "@/components/ui";
 
 /**
@@ -17,11 +11,8 @@ import { Progress } from "@/components/ui";
  * state the detail pages edit, so they cannot disagree with the tables below.
  */
 export function KpiCards() {
-  const { state } = useEvent();
-  const progress = overallProgress(state);
-  const budget = budgetSummary(state);
-  const guests = guestSummary(state);
-  const vendors = vendorSummary(state);
+  const { state, summary } = useEvent();
+  const { progress, budget, guests, vendors } = summary;
   const { currency } = state.profile;
 
   const cards = [
