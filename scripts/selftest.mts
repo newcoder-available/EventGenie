@@ -252,6 +252,26 @@ test("every local generation validates against the model contract", () => {
   }
 });
 
+test("one occasion never borrows another occasion's vocabulary", () => {
+  // A birthday plan that talks about a mandap is the bug this catches: the
+  // local planner started life wedding-only and the wording leaked.
+  const WEDDING_ONLY = /(wedding|mandap|baraat|phere|bridal|sangeet|vidaai)/i;
+  for (const type of EVENT_TYPES) {
+    if (type === "wedding") continue;
+    const ctx = buildContext(createDemoState(type));
+    for (const prompt of EVENT_THEMES[type].suggestions) {
+      const reply = mockReply(prompt, ctx);
+      const m1 = reply.match(WEDDING_ONLY);
+      assert.ok(!m1, `${type} reply to "${prompt}" says "${m1?.[0]}"`);
+
+      const gen = mockGeneration(prompt, ctx);
+      const text = [gen.headline, gen.summary, ...gen.tasks.map((t) => t.title), ...gen.ideas.map((i) => `${i.title} ${i.note}`)].join(" ");
+      const m2 = text.match(WEDDING_ONLY);
+      assert.ok(!m2, `${type} generation for "${prompt}" says "${m2?.[0]}"`);
+    }
+  }
+});
+
 test("intent classification routes the documented prompts", () => {
   assert.equal(classify("Help me reduce my catering budget"), "reduce-budget");
   assert.equal(classify("Create a 6-month wedding checklist"), "checklist");

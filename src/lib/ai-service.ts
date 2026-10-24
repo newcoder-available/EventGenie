@@ -2,6 +2,7 @@ import type { EventContext, Generation } from "./ai-schema";
 import { GenerationSchema } from "./ai-schema";
 import { budgetByCategory, budgetSummary, guestSummary, taskSummary, vendorSummary } from "./calculations";
 import { hostParts } from "./utils";
+import { themeFor } from "./eventThemes";
 import type { EventState } from "@/types/event";
 
 /**
@@ -163,13 +164,14 @@ function money(n: number, currency: string) {
 }
 
 export function mockReply(prompt: string, c: EventContext): string {
+  const noun = themeFor(c.eventType).nouns.event;
   const lead = Math.max(0, Math.ceil((Date.parse(`${c.eventDate}T00:00:00Z`) - Date.now()) / 86_400_000));
   const perHead = c.guestCount > 0 ? Math.round(c.totalBudget / c.guestCount) : 0;
   const left = c.totalBudget - c.committed;
 
   switch (classify(prompt)) {
     case "reduce-budget":
-      return `The two lines with real give are catering and decor — together they are usually more than half the spend, and guests notice a smaller guest list far less than they notice bad food. Dropping twenty covers at ${money(Math.round(perHead * 0.45), c.currency)} a head saves roughly ${money(Math.round(perHead * 0.45 * 20), c.currency)} without touching anything anyone will remember.\n\nAfter that, look at decoration before photography. Florals can usually come down 25% by concentrating them where people stand still — the mandap and the entrance — and leaving the walkways plain. You currently have ${money(left, c.currency)} uncommitted, so you have room to decide rather than react.`;
+      return `The two lines with real give are catering and decor — together they are usually more than half the spend, and guests notice a smaller guest list far less than they notice bad food. Dropping twenty covers at ${money(Math.round(perHead * 0.45), c.currency)} a head saves roughly ${money(Math.round(perHead * 0.45 * 20), c.currency)} without touching anything anyone will remember.\n\nAfter that, look at decoration before photography. Florals can usually come down 25% by concentrating them where people stand still — the entrance and wherever people gather — and leaving the walkways plain. You currently have ${money(left, c.currency)} uncommitted, so you have room to decide rather than react.`;
 
     case "theme":
       return `For ${c.city} in February, a royal Rajasthani direction works because the light is kind and the architecture does most of the job. Marigold and ivory as the base, old gold for metal, one deep accent — pomegranate or indigo — used sparingly on linen and invitations. Keep the palette to three and repeat it everywhere rather than adding a fourth.\n\nThe thing that makes it read as considered rather than themed: pick one motif, such as a block print or a jali pattern, and run it through the invitation, the table runners and the signage. At ${c.guestCount} guests, repetition reads richer than variety.`;
@@ -178,13 +180,13 @@ export function mockReply(prompt: string, c: EventContext): string {
       return `With ${lead} days to go, the order that matters is: lock anything that is physically scarce, then anything that needs your guests' time, then everything else. Venue and photographer first, caterer and decorator next, invitations before you think you need them.\n\nUse "Generate" on this page rather than chat and I will write the whole list into your checklist with dates and owners, so you can tick it off instead of retyping it.`;
 
     case "decor":
-      return `Outdoor evening in ${c.city} means your decor has to work twice — once in daylight as guests arrive, once under lights after dark. Concentrate flowers where people stop moving: the mandap, the entrance, and the two metres around the stage. Walkways need light, not flowers.\n\nFor the lighting itself, warm festoon at roughly three metres plus a few uplights on the walls will do more than any centrepiece. Ask the photographer before you commit to candlelight only — it looks wonderful and photographs badly without a plan.`;
+      return `Outdoor evening in ${c.city} means your decor has to work twice — once in daylight as guests arrive, once under lights after dark. Concentrate decoration where people stop moving: the entrance, the bar, and the two metres around whatever the focal point is. Walkways need light, not flowers.\n\nFor the lighting itself, warm festoon at roughly three metres plus a few uplights on the walls will do more than any centrepiece. Ask the photographer before you commit to candlelight only — it looks wonderful and photographs badly without a plan.`;
 
     case "schedule":
-      return `A February wedding in ${c.city} wants the ceremony late afternoon so the portraits land in golden hour and the reception starts in the dark. Work backwards from the phere: makeup roughly eight hours before, photographer two hours before that for getting-ready coverage, guest arrivals an hour before the baraat.\n\nThe slot people forget is the lull after lunch. Put something in it on purpose — a short performance, a group photo, the cake — or the room empties and never quite refills.`;
+      return `Work backwards from the one moment the whole ${noun} is built around, and put it late enough that the portraits land in good light but early enough that the evening still has somewhere to go. Everything before it — getting ready, photography, guest arrivals — schedules itself once that is fixed.\n\nThe slot people forget is the lull after lunch. Put something in it on purpose — a short performance, a group photo, the cake — or the room empties and never quite refills.`;
 
     case "budget-plan":
-      return `At ${money(c.totalBudget, c.currency)} across ${c.guestCount} guests you are at about ${money(perHead, c.currency)} a head, which in ${c.city} is a comfortable mid-market wedding: a good venue, a proper caterer, and one thing done really well. It does not stretch to a palace and a celebrity photographer at the same time, so pick which one matters.\n\nA workable split is venue 26%, catering 28%, decor 14%, photo and film 10%, and the rest across attire, makeup, entertainment and transport, with 10% held back. Use "Generate" and I will write that into your budget as real lines.`;
+      return `At ${money(c.totalBudget, c.currency)} across ${c.guestCount} guests you are at about ${money(perHead, c.currency)} a head, which in ${c.city} buys a comfortable mid-market ${noun}: a good venue, a proper caterer, and one thing done really well. It does not stretch to a palace and a celebrity photographer at the same time, so pick which one matters.\n\nA workable split puts roughly a quarter on the venue and a little more on food, with decor, photography and entertainment sharing most of the rest and 10% held back. Use "Generate" and I will write that into your budget as real lines.`;
 
     default:
       return `You are ${lead} days out with ${c.tasksDone} of ${c.tasksTotal} tasks done and ${c.vendorsBooked} of ${c.vendorsTotal} vendors booked — that is a reasonable place to be, and the thing most likely to bite you now is the RSVP count, because your caterer prices on it.\n\nAsk me about the budget, the timeline, the vendors or the theme, or use one of the suggestions above. If you want something written into your plan rather than just discussed, use "Generate" and it lands in the right panel.`;
@@ -193,6 +195,7 @@ export function mockReply(prompt: string, c: EventContext): string {
 
 export function mockGeneration(prompt: string, c: EventContext): Generation {
   const intent = classify(prompt);
+  const noun = themeFor(c.eventType).nouns.event;
   const perHead = c.guestCount > 0 ? Math.round(c.totalBudget / c.guestCount) : 0;
   const allocatable = Math.round(c.totalBudget * 0.9);
   const [owner, coHost] = [hostParts(c.hosts)[0] ?? c.hosts, hostParts(c.hosts)[1] ?? "Both"];
@@ -212,8 +215,8 @@ export function mockGeneration(prompt: string, c: EventContext): Generation {
   if (intent === "checklist") {
     return GenerationSchema.parse({
       ...base,
-      headline: "Six-month wedding checklist",
-      summary: `Ten tasks sequenced the way the work actually happens for a ${c.guestCount}-guest wedding in ${c.city}, dated forward from today and assigned so nothing sits with "someone".`,
+      headline: `${c.eventType === "corporate" ? "Offsite" : noun.charAt(0).toUpperCase() + noun.slice(1)} checklist`,
+      summary: `Ten tasks sequenced the way the work actually happens for a ${c.guestCount}-guest ${noun} in ${c.city}, dated forward from today and assigned so nothing sits with "someone".`,
       tasks: [
         { title: "Confirm the final guest count", category: "Guests", dueInDays: 7, priority: "high", owner: "Both" },
         { title: "Lock the catering menu and book a real tasting", category: "Food", dueInDays: 14, priority: "high", owner },
@@ -293,7 +296,7 @@ export function mockGeneration(prompt: string, c: EventContext): Generation {
       tasks: [
         { title: "Trim the guest list by 20 covers with both families", category: "Guests", dueInDays: 7, priority: "high", owner: "Both" },
         { title: "Re-quote catering at the lower headcount", category: "Food", dueInDays: 14, priority: "high", owner },
-        { title: "Cut florals on walkways, keep mandap and entrance", category: "Decor", dueInDays: 21, priority: "medium", owner: coHost },
+        { title: "Cut decoration on walkways, keep the entrance and the focal point", category: "Decor", dueInDays: 21, priority: "medium", owner: coHost },
         { title: "Swap the second entertainment act for a longer DJ set", category: "Vendors", dueInDays: 30, priority: "low", owner },
       ],
       ideas: [],

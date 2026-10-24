@@ -40,6 +40,45 @@ cp .env.example .env.local   # then set ANTHROPIC_API_KEY
 
 ---
 
+## Screenshots
+
+**Step 1 — pick the occasion.** The landing page is the product's front door: seven occasions,
+each previewing its own accent and decoration before you commit to it.
+
+![EventGenie landing page](docs/screenshots/01-landing.jpg)
+
+![The seven occasions, each with its own accent, icon and starter plan](docs/screenshots/02-occasions.jpg)
+
+**Step 2 — sign in.** Choosing Birthday re-skins everything: violet accent, balloons and a cake
+instead of a marigold swag, and copy written for that occasion. No password — see the note in the
+deviations section below.
+
+![Birthday sign-in, themed with balloons and a cake](docs/screenshots/03-signin-birthday.jpg)
+
+**The dashboard, themed two ways.** Same code, same layout, same chart palette — only the
+occasion differs.
+
+| Birthday | Wedding |
+| --- | --- |
+| ![Birthday dashboard](docs/screenshots/04-dashboard-birthday.jpg) | ![Wedding dashboard](docs/screenshots/07-dashboard-wedding.jpg) |
+
+Note the sidebar: *My Birthday* against *My Wedding*, and different task, RSVP and vendor counts,
+because each occasion carries its own complete sample plan.
+
+**Budget planner.** The donut is the one place the brand accent deliberately does *not* reach —
+the eight category hues are a separate set, validated against the ivory canvas for contrast and
+colourblind separation, and they stay put whatever occasion you pick.
+
+![Budget planner with the category donut and legend](docs/screenshots/05-budget.jpg)
+
+**AI planning assistant.** Streaming chat on the left, structured generation on the right.
+Everything it proposes is previewed and only written to your plan when you press *Apply*.
+
+![AI planning assistant with a generated birthday checklist](docs/screenshots/06-ai-assistant.jpg)
+
+> Screenshots are from Guided Demo mode — no `ANTHROPIC_API_KEY` set, so the assistant is
+> answering from the built-in deterministic planner. With a key it streams from Claude instead.
+
 ## The flow
 
 ```
