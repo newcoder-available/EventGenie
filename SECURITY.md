@@ -58,7 +58,7 @@ never logged. The browser's CSP `connect-src` is `'self'`, so the page has no ro
 provider even if something tried.
 
 **PII minimisation.** The model context is built from counts and totals, never from the
-guest list: no guest name is ever sent, and `scripts/selftest.mts` asserts it. Beyond that,
+guest list: no guest name is ever sent, and `tests/security.test.mts` asserts it. Beyond that,
 before any free text is put in a prompt it passes through
 [`redactPii`](src/lib/security.ts), which removes email addresses, phone numbers, card-shaped
 digit runs, Aadhaar-shaped numbers, IBANs and UPI handles. The same patterns run in the browser

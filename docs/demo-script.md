@@ -78,7 +78,7 @@ distinguish this from a template.
 | # | Time | On screen | Narration |
 |---|---|---|---|
 | 11 | 1:30–1:44 | Budget Planner, slowly scrolling the donut and the category rollup. Then switch occasion and return to Budget — the chart colours are unchanged. | "The chart palette doesn't follow the theme. Those eight hues were validated as a set for contrast and colourblind separation — so the brand changes and the data doesn't." |
-| 12 | 1:44–1:56 | Terminal: `npm run selftest`, all twenty-two passing. Hold on the list. | "Twenty-two tests cover the parts that fail quietly: redaction, prompt fencing, the budget arithmetic, and whether any occasion borrows another's vocabulary." |
+| 12 | 1:44–1:56 | Terminal: `npm test`, all twenty-six passing. Hold on the list. | "Twenty-six tests cover the parts that fail quietly: redaction, prompt fencing, the budget arithmetic, and whether any occasion borrows another's vocabulary." |
 | 13 | 1:56–2:04 | Split: `.env.example` on one side, the assistant answering on the other with no key set. | "And it runs with no API key at all. A deterministic planner answers instead, so the whole product demos offline." |
 
 ---

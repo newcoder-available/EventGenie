@@ -6,7 +6,9 @@ import { useEvent } from "@/hooks/useEvent";
 import type { Task } from "@/types/event";
 import { Button, Card, Input, PageHeading, Progress } from "@/components/ui";
 import { TaskDialog } from "@/components/checklist/TaskDialog";
-import { TaskFilterBar, TaskList, type TaskFilter } from "@/components/checklist/TaskList";
+import { TaskList } from "@/components/checklist/TaskList";
+import { TaskFilterBar } from "@/components/checklist/TaskFilterBar";
+import type { TaskFilter } from "@/components/checklist/filters";
 
 export default function ChecklistPage() {
   const [filter, setFilter] = useState<TaskFilter>("All");

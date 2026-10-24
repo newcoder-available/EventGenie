@@ -9,9 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "selftest": "node --test --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/alias-hook.mjs scripts/selftest.mts",
     "lint:fix": "eslint . --fix",
-    "test": "node --test --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/alias-hook.mjs scripts/selftest.mts",
+    "test": "node --test --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/alias-hook.mjs \"tests/**/*.test.mts\"",
     "verify": "npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {

@@ -301,7 +301,8 @@ src/
   lib/eventThemes.ts          accents, motifs, nouns, prompts per occasion
   types/event.ts
   proxy.ts                    per-request nonce CSP
-scripts/selftest.mts
+tests/                      one suite per concern
+  security|calculations|validation|planner|themes|csv|live.test.mts
 ```
 
 ---

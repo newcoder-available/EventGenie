@@ -9,10 +9,12 @@ app/        routing and page composition only — no business logic
   (public)/   landing (occasion picker) and demo sign-in, no app shell
   (app)/      the ten planning screens, behind the session guard
   api/        two server routes; the only place the API key exists
+  error.tsx, global-error.tsx, not-found.tsx  failure boundaries
 
 components/ presentation
   layout/     shell, sidebar, top bar, session guard
-  ui/         Radix + CVA primitives, FormDialog, generated Artwork, ornaments
+  ui/         one component per file (Button, Card, Dialog, Inputs, …) behind
+              an index barrel, plus FormDialog, Artwork and ornaments
   <domain>/   budget, checklist, timeline, guests, vendors, inspiration,
               schedule, ai-assistant — one folder per planning screen
 
@@ -112,6 +114,8 @@ cannot tell the difference and the apply path is exercised either way.
 npm run verify     # eslint, tsc --noEmit, 26 tests
 ```
 
-Tests live in `scripts/selftest.mts` and run on `node:test` with a small
-resolver hook for the `@/` alias. The live probes (CSP headers, cross-origin
+Tests live in `tests/`, one suite per concern (security, calculations,
+validation, planner, themes, csv, live), sharing `tests/fixtures.mts`. They run
+on `node:test` with a small resolver hook for the `@/` alias, and are covered
+by `tsc` rather than excluded from it. The live probes (CSP headers, cross-origin
 refusal, rate limiting) need a dev server and are opt-in via `EVENTGENIE_LIVE`.
